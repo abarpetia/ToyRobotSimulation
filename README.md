@@ -12,7 +12,7 @@ A Toy Robot simulation code, which simulates robot moving on a 6 X 6 tabletop wi
 1. To build the solution, Open ToyRobotSimulation.sln in to Visual Studio 2019.
 2. Click on Build solution from the Build menu.
 
-# Run solution
+# User Interface
 1. Go to Publish folder and double click on ToyRobotSimulation.exe
 
 # Accepted Commands
