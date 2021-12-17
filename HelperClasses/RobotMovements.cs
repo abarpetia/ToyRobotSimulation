@@ -8,14 +8,19 @@ namespace ToyRobotSimulation.HelperClasses
 {
   public class RobotMovements : IRobotMovements
   {
-    Direction? direction { get; set; }
+    private DirectionHelper.Directions direction { get; set; }
     private int xPosition { get; set; }
     private int yPosition { get; set; }
-    public void Move()
+    private bool _isRobotPlacedFlag = false;
+
+    /// <summary>
+    /// This method is used to move robot forward according to its facing direction. 
+    /// </summary>
+    public void MoveRobotForward()
     {
       switch (direction)
       {
-        case Direction.NORTH:
+        case DirectionHelper.Directions.NORTH:
           if (PositionValidation(xPosition, yPosition + 1))
           {
             yPosition++;
@@ -25,7 +30,7 @@ namespace ToyRobotSimulation.HelperClasses
             throw new IndexOutOfRangeException("Provided position is outside tabletop, robot will fall.");
           }
           break;
-        case Direction.SOUTH:
+        case DirectionHelper.Directions.SOUTH:
           if (PositionValidation(xPosition, yPosition - 1))
           {
             yPosition--;
@@ -35,7 +40,7 @@ namespace ToyRobotSimulation.HelperClasses
             throw new IndexOutOfRangeException("Provided position is outside tabletop, robot will fall.");
           }
           break;
-        case Direction.EAST:
+        case DirectionHelper.Directions.EAST:
           if (PositionValidation(xPosition + 1, yPosition))
           {
             xPosition++;
@@ -45,7 +50,7 @@ namespace ToyRobotSimulation.HelperClasses
             throw new IndexOutOfRangeException("Provided position is outside tabletop, robot will fall.");
           }
           break;
-        case Direction.WEST:
+        case DirectionHelper.Directions.WEST:
           if (PositionValidation(xPosition - 1, yPosition))
           {
             xPosition--;
@@ -57,56 +62,96 @@ namespace ToyRobotSimulation.HelperClasses
           break;
       }
     }
-    public void Right()
+
+    /// <summary>
+    /// This method used to rotate robot 90 degree to right. 
+    /// </summary>
+    public void RotateRobotToRight()
     {
-      switch (direction)
-      {
-        case Direction.NORTH:
-          direction = Direction.EAST;
-          break;
-        case Direction.SOUTH:
-          direction = Direction.WEST;
-          break;
-        case Direction.EAST:
-          direction = Direction.SOUTH;
-          break;
-        case Direction.WEST:
-          direction = Direction.NORTH;
-          break;
-      }
+      direction = DirectionHelper._rotateRight[direction];
     }
-    public void Left()
+
+    /// <summary>
+    /// This method used to rotate robot 90 degree to left. 
+    /// </summary>
+    public void RotateRobotToLeft()
     {
-      switch (direction)
-      {
-        case Direction.NORTH:
-          direction = Direction.WEST;
-          break;
-        case Direction.SOUTH:
-          direction = Direction.EAST;
-          break;
-        case Direction.EAST:
-          direction = Direction.NORTH;
-          break;
-        case Direction.WEST:
-          direction = Direction.SOUTH;
-          break;
-      }
+      direction = DirectionHelper._rotateLeft[direction];
     }
-    public string Report()
+
+    /// <summary>
+    /// This method used to report current robot location. 
+    /// </summary>
+    public string ReportCurrentPosition()
     {
       return "Output: " + xPosition + "," + yPosition + "," + direction;
     }
-    public bool Place(Direction? _direction, int _x, int _y)
+
+    /// <summary>
+    /// This method is used to place robot on the tabletop according to provided coordinated and direction.
+    /// </summary>
+    public void PlaceRobotOnTableTop(string[] commandValues)
     {
-      if (_direction != null)
+      if (!IsRobotPlaced())
       {
-        direction = _direction;
+        int _xPosition;
+        if (!int.TryParse(commandValues[0], out _xPosition))
+        {
+          throw new FormatException("Provided parameter 1 is not an integer.");
+        }
+        int _yPosition;
+        if (!int.TryParse(commandValues[1], out _yPosition))
+        {
+          throw new FormatException("Provided parameter 2 is not an integer.");
+        }
+        if (!PositionValidation(_xPosition, _yPosition))
+        {
+          throw new IndexOutOfRangeException("Provided position is outside tabletop, robot will fall.");
+        }
+        direction = DirectionHelper.DirectionParser(commandValues[2]);
+        xPosition = _xPosition;
+        yPosition = _yPosition;
+        _isRobotPlacedFlag = true;
       }
-      xPosition = _x;
-      yPosition = _y;
-      return true;
+      else
+      {
+        throw new Exception("Robot is already placed.");
+      }
     }
+
+    /// <summary>
+    /// This method is used to update robot's current position as per the provided coordinate. 
+    /// </summary>
+    public void UpdateRobotPlaceOnTableTop(string[] commandValues)
+    {
+      if (IsRobotPlaced())
+      {
+        int _xPosition;
+        if (!int.TryParse(commandValues[0], out _xPosition))
+        {
+          throw new FormatException("Provided parameter 1 is not an integer.");
+        }
+        int _yPosition;
+        if (!int.TryParse(commandValues[1], out _yPosition))
+        {
+          throw new FormatException("Provided parameter 2 is not an integer.");
+        }
+        if (!PositionValidation(xPosition, yPosition))
+        {
+          throw new IndexOutOfRangeException("Provided position is outside tabletop, robot will fall.");
+        }
+        xPosition = _xPosition;
+        yPosition = _yPosition;
+      }
+      else
+      {
+        throw new Exception("Robot not placed: Please place the robot first.");
+      }
+    }
+
+    /// <summary>
+    /// This method used to validate x and y coordinates and make sure robot will not fall off the table.
+    /// </summary>
     public bool PositionValidation(int _xPosition, int _yPosition)
     {
       if ((_xPosition >= 0 && _xPosition <= 5) && (_yPosition >= 0 && _yPosition <= 5))
@@ -114,6 +159,14 @@ namespace ToyRobotSimulation.HelperClasses
         return true;
       }
       return false;
+    }
+
+    /// <summary>
+    /// This method used to check whether robot is already placed on the tabletop. 
+    /// </summary>
+    public bool IsRobotPlaced()
+    {
+      return _isRobotPlacedFlag;
     }
   }
 }
