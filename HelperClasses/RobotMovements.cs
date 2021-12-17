@@ -97,18 +97,12 @@ namespace ToyRobotSimulation.HelperClasses
     {
       return "Output: " + xPosition + "," + yPosition + "," + direction;
     }
-    public bool InitialPlace(Direction? _direction, int _x, int _y)
+    public bool Place(Direction? _direction, int _x, int _y)
     {
       if (_direction != null)
       {
         direction = _direction;
       }
-      xPosition = _x;
-      yPosition = _y;
-      return true;
-    }
-    public bool Place(int _x, int _y)
-    {
       xPosition = _x;
       yPosition = _y;
       return true;

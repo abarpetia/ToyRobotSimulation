@@ -11,8 +11,7 @@ namespace ToyRobotSimulation
       IRobotMovements robotMovements = new RobotMovements();
 
       do
-      {
-      {
+      {      
         try
         {
           Console.Clear();
@@ -119,9 +118,7 @@ namespace ToyRobotSimulation
               break;
             case "EXIT":
             case "X":
-              return;
-            case "":
-              throw new ArgumentNullException("Please enter valid command.");
+              return;            
             default:
               throw new InvalidOperationException("Invalid Command.");
           }
